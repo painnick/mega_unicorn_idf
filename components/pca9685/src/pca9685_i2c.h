@@ -253,7 +253,7 @@ void pca9685_i2c_register(pca9685_dev_t *dev,
                           uint8_t _sub_addr_2,
                           uint8_t _sub_addr_3);
 
-esp_err_t pca9685_i2c_led_count(pca9685_dev_t dev, uint8_t led_no, uint16_t led_on_tm);
+esp_err_t pca9685_i2c_led_count(pca9685_dev_t dev, uint8_t led_no, uint16_t led_on_tm, uint16_t delay_tm);
 
 #ifdef __cplusplus
 }
