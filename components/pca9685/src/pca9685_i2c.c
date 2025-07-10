@@ -170,6 +170,27 @@ esp_err_t pca9685_i2c_led_pwm_set(const pca9685_dev_t dev,
   return pca9685_i2c_hal_write(dev.i2c_addr, data, 5);
 }
 
+esp_err_t pca9685_i2c_led_pwm_set2(const pca9685_dev_t dev,
+                                const uint8_t led_no,
+                                const uint16_t led_on_tm,
+                                uint16_t delay_tm) {
+  const uint8_t reg = (led_no * 4) + LED_OFFSET_ADR;
+  const uint16_t led_off_tm = delay_tm + led_on_tm;
+
+  if (delay_tm == 0)
+    delay_tm = 1;
+
+  uint8_t data[5];
+  data[0] = reg;
+  data[1] = (delay_tm - 1) & 0xFF;
+  data[2] = (delay_tm - 1) >> 8;
+  data[3] = led_off_tm > PWM_OUTPUT_COUNTER_MAX
+              ? (PWM_OUTPUT_COUNTER_MAX - led_off_tm) & 0xFF
+              : (led_off_tm - 1) & 0xFF;
+  data[4] = led_off_tm > PWM_OUTPUT_COUNTER_MAX ? (PWM_OUTPUT_COUNTER_MAX - led_off_tm) >> 8 : (led_off_tm - 1) >> 8;
+  return pca9685_i2c_hal_write(dev.i2c_addr, data, 5);
+}
+
 esp_err_t pca9685_i2c_all_led_pwm_set(const pca9685_dev_t dev, const float d_cycle, const float delay) {
   const uint8_t reg = REG_ALL_LED;
   uint8_t data[5];
@@ -292,23 +313,3 @@ void pca9685_i2c_register(pca9685_dev_t *dev,
   pca9685_i2c_write_sub_addr(*dev, PCA9685_SUB_ADDR_3, dev->sub_addr_3);
 }
 
-esp_err_t pca9685_i2c_led_count(const pca9685_dev_t dev,
-                                const uint8_t led_no,
-                                const uint16_t led_on_tm,
-                                uint16_t delay_tm) {
-  const uint8_t reg = (led_no * 4) + LED_OFFSET_ADR;
-  const uint16_t led_off_tm = delay_tm + led_on_tm;
-
-  if (delay_tm == 0)
-    delay_tm = 1;
-
-  uint8_t data[5];
-  data[0] = reg;
-  data[1] = (delay_tm - 1) & 0xFF;
-  data[2] = (delay_tm - 1) >> 8;
-  data[3] = led_off_tm > PWM_OUTPUT_COUNTER_MAX
-              ? (PWM_OUTPUT_COUNTER_MAX - led_off_tm) & 0xFF
-              : (led_off_tm - 1) & 0xFF;
-  data[4] = led_off_tm > PWM_OUTPUT_COUNTER_MAX ? (PWM_OUTPUT_COUNTER_MAX - led_off_tm) >> 8 : (led_off_tm - 1) >> 8;
-  return pca9685_i2c_hal_write(dev.i2c_addr, data, 5);
-}

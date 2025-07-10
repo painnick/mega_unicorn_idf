@@ -103,16 +103,16 @@ void app_main(void)
     if (err == ESP_OK)
     {
         ESP_LOGI(TAG, "PCA9685 initialization successful");
-        pca9685_i2c_led_count(pca9685_1, SERVO_OUTPUT_PIN_1, 307, 0);
+        pca9685_i2c_led_pwm_set2(pca9685_1, SERVO_OUTPUT_PIN_1, 307, 0);
         pca9685_i2c_hal_ms_delay(1000 * 10);
 
         while(1)
         {
-            pca9685_i2c_led_count(pca9685_1, SERVO_OUTPUT_PIN_1, 100, 0);
+            pca9685_i2c_led_pwm_set2(pca9685_1, SERVO_OUTPUT_PIN_1, 100, 0);
             pca9685_i2c_hal_ms_delay(1000 * 3);
-            pca9685_i2c_led_count(pca9685_1, SERVO_OUTPUT_PIN_1, 300, 0);
+            pca9685_i2c_led_pwm_set2(pca9685_1, SERVO_OUTPUT_PIN_1, 300, 0);
             pca9685_i2c_hal_ms_delay(1000 * 3);
-            pca9685_i2c_led_count(pca9685_1, SERVO_OUTPUT_PIN_1, 500, 0);
+            pca9685_i2c_led_pwm_set2(pca9685_1, SERVO_OUTPUT_PIN_1, 500, 0);
             pca9685_i2c_hal_ms_delay(1000 * 10);
         }
     }
