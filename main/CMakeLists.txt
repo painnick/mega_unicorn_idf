@@ -1,2 +1,9 @@
-idf_component_register(SRCS "pca9685_i2c_hal.c" "pca9685_i2c.c" "example_usage.c"
-                    INCLUDE_DIRS ".")
+set(srcs
+        "main.c"
+)
+
+set(requires "pca9685")
+
+idf_component_register(SRCS "${srcs}"
+        INCLUDE_DIRS "."
+        REQUIRES "${requires}")

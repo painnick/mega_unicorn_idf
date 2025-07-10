@@ -193,11 +193,6 @@ int16_t pca9685_i2c_led_set(pca9685_dev_t dev, uint8_t led_no, pca9685_led_state
  */
 int16_t pca9685_i2c_all_led_set(pca9685_dev_t dev, pca9685_led_state_t state);
 
-int16_t pca9685_i2c_servo_set(pca9685_dev_t dev, uint8_t led_no, float d_cycle_ms, float delay);
-
-
-int16_t pca9685_i2c_led_count(pca9685_dev_t dev, uint8_t led_no, uint16_t led_on_tm);
-
 /**
  * @brief Set PCA9685 LEDx PWM output
  */
@@ -257,6 +252,8 @@ void pca9685_i2c_register(pca9685_dev_t *dev,
                           uint8_t _sub_addr_1,
                           uint8_t _sub_addr_2,
                           uint8_t _sub_addr_3);
+
+int16_t pca9685_i2c_led_count(pca9685_dev_t dev, uint8_t led_no, uint16_t led_on_tm);
 
 #ifdef __cplusplus
 }
