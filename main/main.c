@@ -8,7 +8,7 @@
 #include "pca9685_i2c.h"
 #include "pca9685_i2c_hal.h"
 
-static const char *TAG = "example_usage";
+static const char *TAG = "main";
 
 #define PCA9685_OSC_CLK         25000000
 #define SERVO_PWM_FREQ          50
