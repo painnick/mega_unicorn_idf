@@ -16,7 +16,7 @@ typedef std::function<void(PCA9685Servo *servo, int16_t step)> OnReached;
 
 class PCA9685Servo {
   protected:
-    std::string _tag;
+    const std::string& _tag;
     uint16_t _pos = 0;
     uint16_t _min_val = 100;
     uint16_t _max_val = 500;
