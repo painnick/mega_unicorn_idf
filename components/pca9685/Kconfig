@@ -1,4 +1,4 @@
-menu "Mega Unicorn Gundam Configuration"
+menu "PCA9685(I2C)"
 
     config PCA9685_I2C_MASTER_SCL
         int "PCA9685 - SCL GPIO Num"
