@@ -80,6 +80,14 @@ extern "C" void app_main(void) {
 
     PCA9685Servo sg90("Pin1");
     sg90.target(500);
+    sg90.onReached([](PCA9685Servo *pca9685_servo, const int16_t step) {
+      if (step > 0) {
+        pca9685_servo->target(100);
+      } else {
+        pca9685_servo->target(500);
+      }
+      pca9685_servo->step(step * -1);
+    });
 
     pca9685servo_set_servo(1, &sg90);
 
