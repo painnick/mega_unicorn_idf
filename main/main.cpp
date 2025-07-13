@@ -1,6 +1,7 @@
 #include <cstdio>
 #include "esp_log.h"
 #include "esp_err.h"
+#include "esp_random.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "sdkconfig.h"
@@ -78,15 +79,22 @@ extern "C" void app_main(void) {
 
     pca9685servo_init(&pca9685_1);
 
+    int counter = 0;
     PCA9685Servo sg90("Pin1");
     sg90.target(500);
-    sg90.onReached([](PCA9685Servo *pca9685_servo, const int16_t step) {
+    sg90.onReached([&counter](PCA9685Servo *pca9685_servo, const int16_t step) {
+      const auto abs_step = (esp_random() % 10) + 1;
       if (step > 0) {
         pca9685_servo->target(100);
+        pca9685_servo->step(abs_step * -1);
       } else {
         pca9685_servo->target(500);
+        pca9685_servo->step(abs_step);
       }
-      pca9685_servo->step(step * -1);
+      counter++;
+      if (counter >= 4) {
+        pca9685_servo->step(0);
+      }
     });
 
     pca9685servo_set_servo(1, &sg90);
