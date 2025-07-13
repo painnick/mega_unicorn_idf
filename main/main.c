@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include "esp_log.h"
 #include "esp_err.h"
-#include "esp_timer.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "sdkconfig.h"
@@ -10,55 +9,15 @@
 #include "pca9685_i2c.h"
 #include "pca9685_i2c_hal.h"
 
+#include "pca9685_servo.h"
+
 static const char *TAG = "main";
 
 #define USE_I2C_ADDRESS         I2C_DEFAULT_ADDRESS
 
-#define TIMER_DIVIDER         80         // 타이머 분주기 (80MHz / 80 = 1MHz → 1 tick = 1μs)
-#define TIMER_SCALE           (TIMER_BASE_CLK / TIMER_DIVIDER)  // 1,000,000
-#define TIMER_INTERVAL_SEC    (1.0)      // 인터럽트 간격 (초)
-#define TIMER_GROUP           TIMER_GROUP_0
-#define TIMER_INDEX           TIMER_0
 
 pca9685_dev_t pca9685_1;
 
-#define SG90_MIN_FREQ 100
-#define SG90_MAX_FREQ 500
-
-uint16_t SG90_CUR_FREQ = SG90_MIN_FREQ;
-uint16_t SG90_STEP = 15;
-bool SG90_FORWARD = true;
-uint16_t SG90_WAIT_COUNT = 0;
-
-static void periodic_timer_callback(void *arg) {
-  if (SG90_WAIT_COUNT > 0) {
-    SG90_WAIT_COUNT--;
-    return;
-  }
-
-  if (SG90_FORWARD) {
-    SG90_CUR_FREQ += SG90_STEP;
-    if (SG90_CUR_FREQ > SG90_MAX_FREQ + (SG90_STEP - 1)) {
-      SG90_WAIT_COUNT = 50; // 20ms x 50 = 1,000ms;
-
-      SG90_FORWARD = false;
-      SG90_CUR_FREQ -= SG90_STEP * 2;
-    }
-  } else {
-    SG90_CUR_FREQ -= SG90_STEP;
-    if (SG90_CUR_FREQ < SG90_MIN_FREQ - (SG90_STEP - 1)) {
-      SG90_WAIT_COUNT = 50; // 20ms x 50 = 1,000ms;
-
-      SG90_FORWARD = true;
-      SG90_CUR_FREQ += SG90_STEP * 2;
-    }
-  }
-
-  // const int64_t time_since_boot = esp_timer_get_time();
-  // ESP_LOGI(TAG, "Periodic timer called, time since boot: %lld ms - val %d", time_since_boot / 1000, SG90_CUR_FREQ);
-
-  pca9685_i2c_led_pwm_set2(pca9685_1, SERVO_OUTPUT_PIN_1, SG90_CUR_FREQ, 0);
-}
 
 void app_main(void) {
   esp_err_t err = ESP_OK;
@@ -116,29 +75,14 @@ void app_main(void) {
 
   if (err == ESP_OK) {
     ESP_LOGI(TAG, "PCA9685 initialization successful");
-    // pca9685_i2c_led_pwm_set2(pca9685_1, SERVO_OUTPUT_PIN_1, 307, 0);
-    // pca9685_i2c_hal_ms_delay(1000 * 10);
 
-    ESP_LOGI(TAG, "Initializing hardware timer...");
-    const esp_timer_create_args_t periodic_timer_args = {
-      .callback = &periodic_timer_callback,
-      /* name is optional, but may help identify the timer when debugging */
-      .name = "periodic"
-    };
-
-    esp_timer_handle_t periodic_timer;
-    ESP_ERROR_CHECK(esp_timer_create(&periodic_timer_args, &periodic_timer));
-    /* The timer has been created but is not running yet */
-
-    ESP_ERROR_CHECK(esp_timer_start_periodic(periodic_timer, 20 * 1000));
+    pca9685servo_init(&pca9685_1);
 
     while (1) {
       vTaskDelay(pdMS_TO_TICKS(1000));
     }
 
-    /* Clean up and finish the example */
-    ESP_ERROR_CHECK(esp_timer_stop(periodic_timer));
-    ESP_ERROR_CHECK(esp_timer_delete(periodic_timer));
+    pca9685servo_close();
   } else {
     ESP_LOGE(TAG, "PCA9685 initialization failed!");
   }

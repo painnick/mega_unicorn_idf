@@ -2,7 +2,7 @@ set(srcs
         "main.c"
 )
 
-set(requires "pca9685" "esp_timer")
+set(requires "pca9685_servo")
 
 idf_component_register(SRCS "${srcs}"
         INCLUDE_DIRS "."
