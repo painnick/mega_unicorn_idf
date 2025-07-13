@@ -88,27 +88,27 @@ void PCA9685Servo::step(const int16_t step_) {
 
 void PCA9685Servo::update(const pca9685_dev_t *pca9685_for_servo, const uint8_t idx) {
   if (_step == 0) {
-    // ESP_LOGV(TAG, "Servo[%s] is frozen.", tag);
+    ESP_LOGV(TAG, "Servo[%s] is frozen.", _tag.c_str());
   } else if (_step > 0) {
     if (_pos < _target && _pos < _max_val) {
       _pos = (_pos + _step) > _target ? _target : (_pos + _step);
       pca9685_i2c_led_pwm_set2(*pca9685_for_servo, idx, _pos, 0);
-      // ESP_LOGD(TAG, "Servo[%s] [FWD] Move to %d.", tag, _pos);
+      ESP_LOGD(TAG, "Servo[%s] [FWD] Move to %d.", _tag.c_str(), _pos);
     } else {
       auto last_step = _step;
       _step = 0;
-      // ESP_LOGD(TAG, "Servo[%s] [FWD] Reached %d.", tag, _target);
+      ESP_LOGD(TAG, "Servo[%s] [FWD] Reached %d.", _tag.c_str(), _target);
       _onReached(this, last_step);
     }
   } else {
     if (_pos > _target && _pos > _min_val) {
       _pos = (_pos + _step) < _target ? _target : (_pos + _step);
       pca9685_i2c_led_pwm_set2(*pca9685_for_servo, idx, _pos, 0);
-      // ESP_LOGD(TAG, "Servo[%s] [BACK] Move to %d.", tag, _pos);
+      ESP_LOGD(TAG, "Servo[%s] [BACK] Move to %d.", _tag.c_str(), _pos);
     } else {
       auto last_step = _step;
       _step = 0;
-      // ESP_LOGD(TAG, "Servo[%s] [BACK] Reached %d.", tag, _target);
+      ESP_LOGD(TAG, "Servo[%s] [BACK] Reached %d.", _tag.c_str(), _target);
       _onReached(this, last_step);
     }
   }
