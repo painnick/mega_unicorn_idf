@@ -1909,11 +1909,15 @@ CONFIG_WIFI_PROV_STA_ALL_CHANNEL_SCAN=y
 # end of Wi-Fi Provisioning Manager
 
 #
-# Mega Unicorn Gundam Configuration
+# PCA9685(I2C)
 #
 CONFIG_PCA9685_I2C_MASTER_SCL=19
 CONFIG_PCA9685_I2C_MASTER_SDA=18
-# end of Mega Unicorn Gundam Configuration
+# end of PCA9685(I2C)
+
+#
+# PCA9685 Servo
+#
 # end of Component config
 
 # CONFIG_IDF_EXPERIMENTAL_FEATURES is not set
