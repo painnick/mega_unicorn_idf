@@ -1,4 +1,4 @@
-#include <stdio.h>
+#include <cstdio>
 #include "esp_log.h"
 #include "esp_err.h"
 #include "freertos/FreeRTOS.h"
@@ -9,7 +9,7 @@
 #include "pca9685_i2c.h"
 #include "pca9685_i2c_hal.h"
 
-#include "pca9685_servo.h"
+#include "pca9685_servo_manager.h"
 
 static const char *TAG = "main";
 
@@ -78,12 +78,10 @@ extern "C" void app_main(void) {
 
     pca9685servo_init(&pca9685_1);
 
-    pca9685_servo_t servo1 = PCA9685_SG90_SERVO;
-    servo1.pos = 100;
-    servo1.step = 5;
-    servo1.target = 500;
+    PCA9685Servo sg90("Pin1");
+    sg90.target(500);
 
-    pca9685servo_set_servo(1, servo1);
+    pca9685servo_set_servo(1, &sg90);
 
     while (1) {
       vTaskDelay(pdMS_TO_TICKS(1000));

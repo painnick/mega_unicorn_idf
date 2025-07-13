@@ -1,0 +1,26 @@
+//
+// Created by painnick on 25. 7. 13.
+//
+
+#ifndef PCA9685_SERVO_MANAGER_H
+#define PCA9685_SERVO_MANAGER_H
+
+
+#include <stdio.h>
+#include "esp_log.h"
+#include "esp_err.h"
+#include "esp_timer.h"
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
+
+#include "pca9685_i2c.h"
+
+#include "pca9685_servo.h"
+
+void pca9685servo_init(const pca9685_dev_t *pca9685);
+
+void pca9685servo_close();
+
+void pca9685servo_set_servo(int idx, PCA9685Servo *servo);
+
+#endif //PCA9685_SERVO_MANAGER_H
