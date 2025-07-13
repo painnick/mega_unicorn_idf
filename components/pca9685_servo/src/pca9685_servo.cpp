@@ -9,7 +9,7 @@ static const char *TAG = "PCA9685SRV";
 #define TIMER_PERIOD_NS (20 * 1000) // 20ms
 
 const pca9685_dev_t *pca9685_for_servo;
-esp_timer_handle_t periodic_timer;
+esp_timer_handle_t pca9685servo_periodic_timer;
 
 pca9685_servo_t PCA9685Servo[16] = {};
 
@@ -25,16 +25,16 @@ void pca9685servo_init(const pca9685_dev_t *pca9685) {
     .name = "pca9685servo_periodic"
   };
 
-  ESP_ERROR_CHECK(esp_timer_create(&periodic_timer_args, &periodic_timer));
+  ESP_ERROR_CHECK(esp_timer_create(&periodic_timer_args, &pca9685servo_periodic_timer));
   /* The timer has been created but is not running yet */
 
-  ESP_ERROR_CHECK(esp_timer_start_periodic(periodic_timer, TIMER_PERIOD_NS));
+  ESP_ERROR_CHECK(esp_timer_start_periodic(pca9685servo_periodic_timer, TIMER_PERIOD_NS));
 }
 
 void pca9685servo_close() {
   /* Clean up and finish the example */
-  ESP_ERROR_CHECK(esp_timer_stop(periodic_timer));
-  ESP_ERROR_CHECK(esp_timer_delete(periodic_timer));
+  ESP_ERROR_CHECK(esp_timer_stop(pca9685servo_periodic_timer));
+  ESP_ERROR_CHECK(esp_timer_delete(pca9685servo_periodic_timer));
 }
 
 void pca9685servo_set_servo(const int idx, const pca9685_servo_t servo) {
