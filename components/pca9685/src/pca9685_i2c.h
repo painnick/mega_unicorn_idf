@@ -110,6 +110,38 @@ typedef struct {
  */
 #define I2C_ADDRESS_PCA9685             0x40
 
+#define PCA9685_OSC_CLK         25000000
+#define SERVO_PWM_FREQ          50
+
+#define SERVO_OUTPUT_PIN_0      0
+#define SERVO_OUTPUT_PIN_1      1
+#define SERVO_OUTPUT_PIN_2      2
+#define SERVO_OUTPUT_PIN_3      3
+#define SERVO_OUTPUT_PIN_4      4
+#define SERVO_OUTPUT_PIN_5      5
+#define SERVO_OUTPUT_PIN_6      6
+#define SERVO_OUTPUT_PIN_7      7
+#define SERVO_OUTPUT_PIN_8      8
+#define SERVO_OUTPUT_PIN_9      9
+#define SERVO_OUTPUT_PIN_10     10
+#define SERVO_OUTPUT_PIN_11     11
+#define SERVO_OUTPUT_PIN_12     12
+#define SERVO_OUTPUT_PIN_13     13
+#define SERVO_OUTPUT_PIN_14     14
+#define SERVO_OUTPUT_PIN_15     15
+
+/*  Select I2C address to be used. ()
+  I2C Address options:
+  - Default address - 0x40
+  - Sub addresses 1-3
+  - All call address
+*/
+#define I2C_DEFAULT_ADDRESS     0
+#define I2C_SUB_ADDRESS_1       1
+#define I2C_SUB_ADDRESS_2       2
+#define I2C_SUB_ADDRESS_3       3
+#define I2C_ALLCALL_ADDRESS     4
+
 /**
  * @brief PCA9685 default addresses
  */
