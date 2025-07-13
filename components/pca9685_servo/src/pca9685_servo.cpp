@@ -37,10 +37,82 @@ void pca9685servo_close() {
   ESP_ERROR_CHECK(esp_timer_delete(periodic_timer));
 }
 
-void pca9685servo_init_servo(const int idx, const pca9685_servo_t servo) {
+void pca9685servo_set_servo(const int idx, const pca9685_servo_t servo) {
   PCA9685Servo[idx] = servo;
-  if (PCA9685Servo[idx].pos > PCA9685Servo[idx].max_val) PCA9685Servo[idx].pos = PCA9685Servo[idx].max_val;
-  if (PCA9685Servo[idx].pos < PCA9685Servo[idx].min_val) PCA9685Servo[idx].pos = PCA9685Servo[idx].min_val;
+
+  if (PCA9685Servo[idx].pos > PCA9685Servo[idx].max_val) {
+    ESP_LOGW(TAG, "Servo[%d] position(%d) is set to max(%d)", idx, PCA9685Servo[idx].pos, PCA9685Servo[idx].max_val);
+    PCA9685Servo[idx].pos = PCA9685Servo[idx].max_val;
+  }
+  if (PCA9685Servo[idx].pos < PCA9685Servo[idx].min_val) {
+    ESP_LOGW(TAG, "Servo[%d] position(%d) is set to min(%d)", idx, PCA9685Servo[idx].pos, PCA9685Servo[idx].min_val);
+    PCA9685Servo[idx].pos = PCA9685Servo[idx].min_val;
+  }
+
+  if (PCA9685Servo[idx].target > PCA9685Servo[idx].max_val) {
+    ESP_LOGW(TAG, "Servo[%d] target(%d) is set to max(%d)", idx, PCA9685Servo[idx].target, PCA9685Servo[idx].max_val);
+    PCA9685Servo[idx].target = PCA9685Servo[idx].max_val;
+  }
+  if (PCA9685Servo[idx].target < PCA9685Servo[idx].min_val) {
+    ESP_LOGW(TAG, "Servo[%d] target(%d) is set to min(%d)", idx, PCA9685Servo[idx].target, PCA9685Servo[idx].min_val);
+    PCA9685Servo[idx].target = PCA9685Servo[idx].min_val;
+  }
+
+  if (PCA9685Servo[idx].step == 0) {
+    ESP_LOGV(TAG, "Servo[%d] is frozen.", idx);
+  } else if (PCA9685Servo[idx].step > 0) {
+    if (PCA9685Servo[idx].pos > PCA9685Servo[idx].target) {
+      ESP_LOGW(TAG, "Servo[%d] position(%d) is set to %d", idx, PCA9685Servo[idx].pos, PCA9685Servo[idx].target);
+      PCA9685Servo[idx].pos = PCA9685Servo[idx].target;
+    }
+  } else {
+    if (PCA9685Servo[idx].pos < PCA9685Servo[idx].target) {
+      ESP_LOGW(TAG, "Servo[%d] position(%d) is set to %d", idx, PCA9685Servo[idx].pos, PCA9685Servo[idx].target);
+      PCA9685Servo[idx].pos = PCA9685Servo[idx].target;
+    }
+  }
+}
+
+void pca9685servo_set_target(const int idx, const uint16_t target) {
+  PCA9685Servo[idx].target = target;
+  if (PCA9685Servo[idx].target > PCA9685Servo[idx].max_val) {
+    ESP_LOGW(TAG, "Servo[%d] target(%d) is set to max(%d)", idx, PCA9685Servo[idx].target, PCA9685Servo[idx].max_val);
+    PCA9685Servo[idx].target = PCA9685Servo[idx].max_val;
+  }
+  if (PCA9685Servo[idx].target < PCA9685Servo[idx].min_val) {
+    ESP_LOGW(TAG, "Servo[%d] target(%d) is set to min(%d)", idx, PCA9685Servo[idx].target, PCA9685Servo[idx].min_val);
+    PCA9685Servo[idx].target = PCA9685Servo[idx].min_val;
+  }
+}
+
+void pca9685servo_set_position(const int idx, const uint16_t pos) {
+  PCA9685Servo[idx].pos = pos;
+  if (PCA9685Servo[idx].pos > PCA9685Servo[idx].max_val) {
+    ESP_LOGW(TAG, "Servo[%d] position(%d) is set to max(%d)", idx, PCA9685Servo[idx].pos, PCA9685Servo[idx].max_val);
+    PCA9685Servo[idx].pos = PCA9685Servo[idx].max_val;
+  }
+  if (PCA9685Servo[idx].pos < PCA9685Servo[idx].min_val) {
+    ESP_LOGW(TAG, "Servo[%d] position(%d) is set to min(%d)", idx, PCA9685Servo[idx].pos, PCA9685Servo[idx].min_val);
+    PCA9685Servo[idx].pos = PCA9685Servo[idx].min_val;
+  }
+
+  if (PCA9685Servo[idx].step == 0) {
+    ESP_LOGV(TAG, "Servo[%d] is frozen.", idx);
+  } else if (PCA9685Servo[idx].step > 0) {
+    if (PCA9685Servo[idx].pos > PCA9685Servo[idx].target) {
+      ESP_LOGW(TAG, "Servo[%d] position(%d) is set to %d", idx, PCA9685Servo[idx].pos, PCA9685Servo[idx].target);
+      PCA9685Servo[idx].pos = PCA9685Servo[idx].target;
+    }
+  } else {
+    if (PCA9685Servo[idx].pos < PCA9685Servo[idx].target) {
+      ESP_LOGW(TAG, "Servo[%d] position(%d) is set to %d", idx, PCA9685Servo[idx].pos, PCA9685Servo[idx].target);
+      PCA9685Servo[idx].pos = PCA9685Servo[idx].target;
+    }
+  }
+
+  PCA9685Servo[idx].step = 0;
+  PCA9685Servo[idx].target = PCA9685Servo[idx].pos;
+  pca9685_i2c_led_pwm_set2(*pca9685_for_servo, idx, PCA9685Servo[idx].pos, 0);
 }
 
 static void pca9685servo_periodic_timer_callback(void *arg) {

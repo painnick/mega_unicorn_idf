@@ -83,7 +83,7 @@ extern "C" void app_main(void) {
     servo1.step = 5;
     servo1.target = 500;
 
-    pca9685servo_init_servo(1, servo1);
+    pca9685servo_set_servo(1, servo1);
 
     while (1) {
       vTaskDelay(pdMS_TO_TICKS(1000));

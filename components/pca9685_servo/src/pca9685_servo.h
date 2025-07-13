@@ -46,7 +46,11 @@ void pca9685servo_init(const pca9685_dev_t *pca9685);
 
 void pca9685servo_close();
 
-void pca9685servo_init_servo(int idx, pca9685_servo_t servo);
+void pca9685servo_set_servo(int idx, pca9685_servo_t servo);
+
+void pca9685servo_set_target(int idx, uint16_t target);
+
+void pca9685servo_set_position(int idx, uint16_t pos);
 
 #ifdef __cplusplus
 }
