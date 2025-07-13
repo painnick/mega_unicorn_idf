@@ -7,6 +7,8 @@
 #include "sdkconfig.h"
 
 /*  PCA9685 components  */
+#include <format>
+
 #include "pca9685_i2c.h"
 #include "pca9685_i2c_hal.h"
 
@@ -79,25 +81,22 @@ extern "C" void app_main(void) {
 
     pca9685servo_init(&pca9685_1);
 
-    int counter = 0;
-    PCA9685Servo sg90("Pin1");
-    sg90.target(500);
-    sg90.onReached([&counter](PCA9685Servo *pca9685_servo, const int16_t step) {
-      const auto abs_step = (esp_random() % 10) + 1;
-      if (step > 0) {
-        pca9685_servo->target(100);
-        pca9685_servo->step(abs_step * -1);
-      } else {
-        pca9685_servo->target(500);
-        pca9685_servo->step(abs_step);
-      }
-      counter++;
-      if (counter >= 4) {
-        pca9685_servo->step(0);
-      }
-    });
+    for (int idx = 0; idx < 16; idx++) {
+      const auto sg90 = new PCA9685Servo(std::format("Pin{}", idx));
+      sg90->target(500);
+      sg90->onReached([](PCA9685Servo *pca9685_servo, const int16_t step) {
+        const auto abs_step = (esp_random() % 5) + 1;
+        if (step > 0) {
+          pca9685_servo->target(100);
+          pca9685_servo->step(abs_step * -1);
+        } else {
+          pca9685_servo->target(500);
+          pca9685_servo->step(abs_step);
+        }
+      });
 
-    pca9685servo_set_servo(1, &sg90);
+      pca9685servo_set_servo(idx, sg90);
+    }
 
     while (1) {
       vTaskDelay(pdMS_TO_TICKS(1000));
