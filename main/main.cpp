@@ -19,7 +19,7 @@ static const char *TAG = "main";
 pca9685_dev_t pca9685_1;
 
 
-void app_main(void) {
+extern "C" void app_main(void) {
   esp_err_t err = ESP_OK;
 
   pca9685_i2c_hal_init();
@@ -77,6 +77,13 @@ void app_main(void) {
     ESP_LOGI(TAG, "PCA9685 initialization successful");
 
     pca9685servo_init(&pca9685_1);
+
+    pca9685_servo_t servo1 = PCA9685_SG90_SERVO;
+    servo1.pos = 100;
+    servo1.step = 5;
+    servo1.target = 500;
+
+    pca9685servo_init_servo(1, servo1);
 
     while (1) {
       vTaskDelay(pdMS_TO_TICKS(1000));

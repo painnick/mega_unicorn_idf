@@ -26,14 +26,27 @@ extern "C" {
 #define TIMER_GROUP           TIMER_GROUP_0
 #define TIMER_INDEX           TIMER_0
 
+typedef struct {
+  uint16_t pos;
+  uint16_t min_val;
+  uint16_t max_val;
+  uint16_t step;
+  uint16_t target;
+} pca9685_servo_t;
 
-#define SG90_MIN_FREQ 100
-#define SG90_MAX_FREQ 500
-
+inline pca9685_servo_t PCA9685_SG90_SERVO = {
+  .pos = 0,
+  .min_val = 100,
+  .max_val = 500,
+  .step = 5,
+  .target = 0,
+};
 
 void pca9685servo_init(const pca9685_dev_t *pca9685);
 
 void pca9685servo_close();
+
+void pca9685servo_init_servo(int idx, pca9685_servo_t servo);
 
 #ifdef __cplusplus
 }

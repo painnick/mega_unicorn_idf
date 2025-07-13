@@ -1,5 +1,5 @@
 set(srcs
-        "main.c"
+        "main.cpp"
 )
 
 set(requires "pca9685_servo")
