@@ -84,6 +84,7 @@ extern "C" void app_main(void) {
     for (int idx = 0; idx < 16; idx++) {
       const auto sg90 = new PCA9685Servo(std::format("Pin{}", idx));
       sg90->target(500);
+      sg90->step((esp_random() % 5) + 1);
       sg90->onReached([](PCA9685Servo *pca9685_servo, const int16_t step) {
         const auto abs_step = (esp_random() % 5) + 1;
         if (step > 0) {
