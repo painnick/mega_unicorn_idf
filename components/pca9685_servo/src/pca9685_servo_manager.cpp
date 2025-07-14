@@ -41,6 +41,7 @@ void pca9685servo_close() {
 
 void pca9685servo_set_servo(const int idx, PCA9685Servo *servo) {
   servos[idx] = servo;
+  pca9685_set_pwm_value(dev, idx, servo->position());
 }
 
 PCA9685Servo* pca9685servo_get_servo(const int idx) {

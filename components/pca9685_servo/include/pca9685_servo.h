@@ -45,8 +45,6 @@ class PCA9685Servo {
 
     [[nodiscard]] uint16_t target() const { return _target; }
 
-    void position(uint16_t pos_);
-
     [[nodiscard]] uint16_t position() const { return _pos; }
 
     void step(int16_t step_);

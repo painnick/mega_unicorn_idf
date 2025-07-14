@@ -69,23 +69,6 @@ void PCA9685Servo::target(const uint16_t target_, const OnReached &onReached_) {
   _onReached = onReached_;
 }
 
-void PCA9685Servo::position(const uint16_t pos_) {
-  _pos = pos_;
-
-  if (_pos > _max_val) {
-    ESP_LOGW(TAG, "Servo[%s] position(%d) is set to max(%d).", _tag.c_str(), _pos, _max_val);
-    _pos = _max_val;
-  }
-  if (_pos < _min_val) {
-    ESP_LOGW(TAG, "Servo[%s] position(%d) is set to min(%d).", _tag.c_str(), _pos, _min_val);
-    _pos = _min_val;
-  }
-
-  _target = _pos;
-  _step = 0;
-  ESP_LOGW(TAG, "Servo[%s] is set to(%d). And is frozen.", _tag.c_str(), _pos);
-}
-
 void PCA9685Servo::step(const int16_t step_) {
   _step = step_;
   if (_step == 0)
