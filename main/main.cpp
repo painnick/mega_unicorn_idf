@@ -35,30 +35,41 @@ extern "C" void app_main(void) {
 
   pca9685servo_init(&pca9685_dev);
 
-  for (int idx = 0; idx < 16; idx++) {
-    const auto sg90 = new PCA9685Servo(std::format("Pin{}", idx));
-    sg90->step(0);
-
-    pca9685servo_set_servo(idx, sg90);
-  }
-
   // vTaskDelay(pdMS_TO_TICKS(1000 * 5)); // 5,000ms
 
-  const auto servo = pca9685servo_get_servo(0);
-  addServoTask(servo,
+  const auto servo3_Leg1 = new PCA9685Servo(std::format("Leg{}", 1));
+  pca9685servo_set_servo(3, servo3_Leg1);
+  addServoTask(servo3_Leg1,
                0,
                1,
                500);
 
-  addServoTask(servo,
+  addServoTask(servo3_Leg1,
+               2000,
+               -3,
+               100);
+
+  addServoTask(servo3_Leg1,
                7000,
                1,
                500);
 
-  addServoTask(servo,
+  const auto servo1_Foot2 = new PCA9685Servo(std::format("Foot{}", 2));
+  pca9685servo_set_servo(1, servo1_Foot2);
+  addServoTask(servo1_Foot2,
+               0,
+               2,
+               500);
+
+  addServoTask(servo1_Foot2,
                2000,
-               -3,
+               -1,
                100);
+
+  addServoTask(servo1_Foot2,
+               7000,
+               3,
+               500);
 
   while (true) {
     vTaskDelay(pdMS_TO_TICKS(1000));
