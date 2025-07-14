@@ -102,6 +102,7 @@ void PCA9685Servo::update(i2c_dev_t *dev, const uint8_t idx) {
     } else {
       auto last_step = _step;
       _step = 0;
+      pca9685_set_pwm_value(dev, idx, _target);
       ESP_LOGD(TAG, "Servo[%s] [FWD] Reached %d.", _tag.c_str(), _target);
       const auto callback = _onReached;
       _onReached = DoNothingOnReached;
@@ -115,6 +116,7 @@ void PCA9685Servo::update(i2c_dev_t *dev, const uint8_t idx) {
     } else {
       auto last_step = _step;
       _step = 0;
+      pca9685_set_pwm_value(dev, idx, _target);
       ESP_LOGD(TAG, "Servo[%s] [BACK] Reached %d.", _tag.c_str(), _target);
       const auto callback = _onReached;
       _onReached = DoNothingOnReached;
