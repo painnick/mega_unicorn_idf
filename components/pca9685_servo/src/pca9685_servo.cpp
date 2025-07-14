@@ -88,7 +88,10 @@ void PCA9685Servo::position(const uint16_t pos_) {
 
 void PCA9685Servo::step(const int16_t step_) {
   _step = step_;
-  ESP_LOGI(TAG, "Servo[%s] Set step %d.", _tag.c_str(), _step);
+  if (_step == 0)
+    ESP_LOGI(TAG, "Servo[%s] Set step %d(Frozen).", _tag.c_str(), _step);
+  else
+    ESP_LOGI(TAG, "Servo[%s] Set step %d.", _tag.c_str(), _step);
 }
 
 void PCA9685Servo::update(i2c_dev_t *dev, const uint8_t idx) {
@@ -100,7 +103,7 @@ void PCA9685Servo::update(i2c_dev_t *dev, const uint8_t idx) {
       pca9685_set_pwm_value(dev, idx, _pos);
       ESP_LOGD(TAG, "Servo[%s] [FWD] Move to %d.", _tag.c_str(), _pos);
     } else {
-      auto last_step = _step;
+      const auto last_step = _step;
       _step = 0;
       pca9685_set_pwm_value(dev, idx, _target);
       ESP_LOGD(TAG, "Servo[%s] [FWD] Reached %d.", _tag.c_str(), _target);
@@ -114,7 +117,7 @@ void PCA9685Servo::update(i2c_dev_t *dev, const uint8_t idx) {
       pca9685_set_pwm_value(dev, idx, _pos);
       ESP_LOGD(TAG, "Servo[%s] [BACK] Move to %d.", _tag.c_str(), _pos);
     } else {
-      auto last_step = _step;
+      const auto last_step = _step;
       _step = 0;
       pca9685_set_pwm_value(dev, idx, _target);
       ESP_LOGD(TAG, "Servo[%s] [BACK] Reached %d.", _tag.c_str(), _target);
