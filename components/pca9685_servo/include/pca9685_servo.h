@@ -16,7 +16,7 @@ typedef std::function<void(PCA9685Servo *servo, int16_t step)> OnReached;
 
 class PCA9685Servo {
   protected:
-    const std::string& _tag;
+    const std::string &_tag;
     uint16_t _pos = 0;
     uint16_t _min_val = 100;
     uint16_t _max_val = 500;
@@ -38,6 +38,8 @@ class PCA9685Servo {
     uint16_t maxValue() const { return _max_val; };
 
     void target(uint16_t target_);
+
+    void target(uint16_t target_, const OnReached &onReached_);
 
     [[nodiscard]] uint16_t target() const { return _target; }
 

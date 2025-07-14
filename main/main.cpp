@@ -34,18 +34,7 @@ extern "C" void app_main(void) {
 
   for (int idx = 0; idx < 16; idx++) {
     const auto sg90 = new PCA9685Servo(std::format("Pin{}", idx));
-    sg90->target(500);
     sg90->step(0);
-    sg90->onReached([](PCA9685Servo *pca9685_servo, const int16_t step) {
-      const auto abs_step = 1;
-      if (step > 0) {
-        pca9685_servo->target(100);
-        pca9685_servo->step(abs_step * -1);
-      } else {
-        pca9685_servo->target(500);
-        pca9685_servo->step(abs_step);
-      }
-    });
 
     pca9685servo_set_servo(idx, sg90);
   }
@@ -54,7 +43,17 @@ extern "C" void app_main(void) {
 
   for (int idx = 0; idx < 16; idx++) {
     const auto sg90 = pca9685servo_get_servo(idx);
-    sg90->target(500);
+    sg90->target(500,
+                 [](PCA9685Servo *pca9685_servo, const int16_t step) {
+                   const auto abs_step = 1;
+                   if (step > 0) {
+                     pca9685_servo->target(100);
+                     pca9685_servo->step(abs_step * -1);
+                   } else {
+                     pca9685_servo->target(500);
+                     pca9685_servo->step(abs_step);
+                   }
+                 });
     sg90->step(1);
   }
 
