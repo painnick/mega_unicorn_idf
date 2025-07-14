@@ -43,14 +43,14 @@ extern "C" void app_main(void) {
 
   for (int idx = 0; idx < 16; idx++) {
     const auto sg90 = pca9685servo_get_servo(idx);
-    sg90->target(500,
-                 [](PCA9685Servo *pca9685_servo, const int16_t step) {
+    sg90->target(sg90->maxValue(),
+                 [sg90](PCA9685Servo *pca9685_servo, const int16_t step) {
                    const auto abs_step = 1;
                    if (step > 0) {
-                     pca9685_servo->target(100);
+                     pca9685_servo->target(sg90->minValue());
                      pca9685_servo->step(abs_step * -1);
                    } else {
-                     pca9685_servo->target(500);
+                     pca9685_servo->target(sg90->maxValue());
                      pca9685_servo->step(abs_step);
                    }
                  });
