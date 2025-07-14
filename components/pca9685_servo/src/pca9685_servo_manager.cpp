@@ -41,6 +41,10 @@ void pca9685servo_set_servo(const int idx, PCA9685Servo *servo) {
   servos[idx] = servo;
 }
 
+PCA9685Servo* pca9685servo_get_servo(const int idx) {
+  return servos[idx];
+}
+
 static void pca9685servo_periodic_timer_callback(void *arg) {
   // const int64_t time_since_boot = esp_timer_get_time();
   // ESP_LOGI(TAG, "Periodic timer called, time since boot: %lld ms - val %d", time_since_boot / 1000, SG90_CUR_FREQ);

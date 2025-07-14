@@ -35,9 +35,9 @@ extern "C" void app_main(void) {
   for (int idx = 0; idx < 16; idx++) {
     const auto sg90 = new PCA9685Servo(std::format("Pin{}", idx));
     sg90->target(500);
-    sg90->step((esp_random() % 5) + 1);
+    sg90->step(0);
     sg90->onReached([](PCA9685Servo *pca9685_servo, const int16_t step) {
-      const auto abs_step = (esp_random() % 5) + 1;
+      const auto abs_step = 1;
       if (step > 0) {
         pca9685_servo->target(100);
         pca9685_servo->step(abs_step * -1);
@@ -48,6 +48,14 @@ extern "C" void app_main(void) {
     });
 
     pca9685servo_set_servo(idx, sg90);
+  }
+
+  vTaskDelay(pdMS_TO_TICKS(1000 * 5)); // 5,000ms
+
+  for (int idx = 0; idx < 16; idx++) {
+    const auto sg90 = pca9685servo_get_servo(idx);
+    sg90->target(500);
+    sg90->step(1);
   }
 
   while (true) {

@@ -23,4 +23,6 @@ void pca9685servo_close();
 
 void pca9685servo_set_servo(int idx, PCA9685Servo *servo);
 
+PCA9685Servo* pca9685servo_get_servo(int idx);
+
 #endif //PCA9685_SERVO_MANAGER_H
