@@ -3,4 +3,4 @@ idf_component_register(SRC_DIRS "src"
         REQUIRES "pca9685" "esp_timer"
 )
 
-target_compile_definitions(${COMPONENT_LIB} PUBLIC "-DLOG_LOCAL_LEVEL=ESP_LOG_WARN")
+target_compile_definitions(${COMPONENT_LIB} PUBLIC "-DLOG_LOCAL_LEVEL=ESP_LOG_DEBUG")
