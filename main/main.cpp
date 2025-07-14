@@ -11,6 +11,7 @@
 
 #include "pca9685.h"
 #include "pca9685_servo_manager.h"
+#include "servo_task_manager.h"
 
 static auto TAG = "main";
 
@@ -18,6 +19,8 @@ i2c_dev_t pca9685_dev;
 
 
 extern "C" void app_main(void) {
+  initServoTaskManager();
+
   ESP_ERROR_CHECK(i2cdev_init());
 
   std::memset(&pca9685_dev, 0, sizeof(i2c_dev_t));
@@ -41,21 +44,19 @@ extern "C" void app_main(void) {
 
   vTaskDelay(pdMS_TO_TICKS(1000 * 5)); // 5,000ms
 
-  for (int idx = 0; idx < 16; idx++) {
-    const auto sg90 = pca9685servo_get_servo(idx);
-    sg90->target(sg90->maxValue(),
-                 [sg90](PCA9685Servo *pca9685_servo, const int16_t step) {
-                   const auto abs_step = 1;
-                   if (step > 0) {
-                     pca9685_servo->target(sg90->minValue());
-                     pca9685_servo->step(abs_step * -1);
-                   } else {
-                     pca9685_servo->target(sg90->maxValue());
-                     pca9685_servo->step(abs_step);
-                   }
-                 });
-    sg90->step(1);
-  }
+  addServoTask(pca9685servo_get_servo(0),
+               0,
+               1,
+               500,
+               [](PCA9685Servo *pca9685_servo, short i) {
+                 addServoTask(pca9685_servo,
+                              2000,
+                              -3,
+                              100,
+                              [](PCA9685Servo *pca9685_servo, short i) {
+                              });
+               });
+
 
   while (true) {
     vTaskDelay(pdMS_TO_TICKS(1000));

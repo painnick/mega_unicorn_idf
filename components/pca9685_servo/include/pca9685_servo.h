@@ -14,6 +14,8 @@
 class PCA9685Servo;
 typedef std::function<void(PCA9685Servo *servo, int16_t step)> OnReached;
 
+static OnReached DoNothingOnReached = [](PCA9685Servo *servo, int16_t step) {};
+
 class PCA9685Servo {
   protected:
     const std::string &_tag;
@@ -23,7 +25,7 @@ class PCA9685Servo {
     int16_t _step = 5;
     uint16_t _target = 100;
 
-    OnReached _onReached;
+    OnReached _onReached = DoNothingOnReached;
 
   public:
     explicit PCA9685Servo(

@@ -103,9 +103,9 @@ void PCA9685Servo::update(i2c_dev_t *dev, const uint8_t idx) {
       auto last_step = _step;
       _step = 0;
       ESP_LOGD(TAG, "Servo[%s] [FWD] Reached %d.", _tag.c_str(), _target);
-      _onReached(this, last_step);
-      _onReached = [](PCA9685Servo *pca9685_servo, short i) {
-      };
+      const auto callback = _onReached;
+      _onReached = DoNothingOnReached;
+      callback(this, last_step);
     }
   } else {
     if (_pos > _target && _pos > _min_val) {
@@ -116,9 +116,9 @@ void PCA9685Servo::update(i2c_dev_t *dev, const uint8_t idx) {
       auto last_step = _step;
       _step = 0;
       ESP_LOGD(TAG, "Servo[%s] [BACK] Reached %d.", _tag.c_str(), _target);
-      _onReached(this, last_step);
-      _onReached = [](PCA9685Servo *pca9685_servo, short i) {
-      };
+      const auto callback = _onReached;
+      _onReached = DoNothingOnReached;
+      callback(this, last_step);
     }
   }
 }
