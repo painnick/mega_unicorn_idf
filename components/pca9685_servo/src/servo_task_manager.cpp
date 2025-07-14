@@ -42,6 +42,8 @@ void addServoTask(PCA9685Servo *servo_,
     onReached_);
 
   servo_task_queue.push(task);
+
+  ESP_LOGD(TAG, "TaskQueue Push(len=%d).", servo_task_queue.size());
 }
 
 static void servo_tasks_periodic_timer_callback(void *arg) {
@@ -50,10 +52,13 @@ static void servo_tasks_periodic_timer_callback(void *arg) {
     const ServoTask task = servo_task_queue.top();
 
     const auto servo = task.servo;
+    servo->step(0);
     servo->target(task.target);
-    servo->step(task.step);
     servo->onReached(task.onReached);
+    servo->step(task.step);
 
     servo_task_queue.pop();
+
+    ESP_LOGD(TAG, "TaskQueue Pop(len=%d). RunAt(%lld)", servo_task_queue.size(), task.run_ms);
   }
 }
