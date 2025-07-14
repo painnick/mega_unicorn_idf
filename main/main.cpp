@@ -42,21 +42,23 @@ extern "C" void app_main(void) {
     pca9685servo_set_servo(idx, sg90);
   }
 
-  vTaskDelay(pdMS_TO_TICKS(1000 * 5)); // 5,000ms
+  // vTaskDelay(pdMS_TO_TICKS(1000 * 5)); // 5,000ms
 
-  addServoTask(pca9685servo_get_servo(0),
+  const auto servo = pca9685servo_get_servo(0);
+  addServoTask(servo,
                0,
                1,
-               500,
-               [](PCA9685Servo *pca9685_servo, short i) {
-                 addServoTask(pca9685_servo,
-                              2000,
-                              -3,
-                              100,
-                              [](PCA9685Servo *pca9685_servo, short i) {
-                              });
-               });
+               500);
 
+  addServoTask(servo,
+               7000,
+               1,
+               500);
+
+  addServoTask(servo,
+               2000,
+               -3,
+               100);
 
   while (true) {
     vTaskDelay(pdMS_TO_TICKS(1000));
