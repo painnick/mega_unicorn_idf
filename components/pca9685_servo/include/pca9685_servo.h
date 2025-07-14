@@ -36,8 +36,8 @@ class PCA9685Servo {
       int16_t step_ = 5,
       uint16_t target_ = 100);
 
-    uint16_t minValue() const { return _min_val; };
-    uint16_t maxValue() const { return _max_val; };
+    [[nodiscard]] uint16_t minValue() const { return _min_val; };
+    [[nodiscard]] uint16_t maxValue() const { return _max_val; };
 
     void target(uint16_t target_);
 
