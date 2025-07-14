@@ -6,105 +6,53 @@
 #include "freertos/task.h"
 #include "sdkconfig.h"
 
-/*  PCA9685 components  */
+#include <cstring>
 #include <format>
 
-#include "pca9685_i2c.h"
-#include "pca9685_i2c_hal.h"
-
+#include "pca9685.h"
 #include "pca9685_servo_manager.h"
 
-static const char *TAG = "main";
+static auto TAG = "main";
 
-#define USE_I2C_ADDRESS         I2C_DEFAULT_ADDRESS
-
-
-pca9685_dev_t pca9685_1;
+i2c_dev_t pca9685_dev;
 
 
 extern "C" void app_main(void) {
-  esp_err_t err = ESP_OK;
+  ESP_ERROR_CHECK(i2cdev_init());
 
-  pca9685_i2c_hal_init();
+  std::memset(&pca9685_dev, 0, sizeof(i2c_dev_t));
 
-  err += pca9685_i2c_reset(); /* Perform all device reset */
-  ESP_LOGI(TAG, "Device reset: %s", err == PCA9685_OK ? "Successful" : "Failed");
+  ESP_ERROR_CHECK(
+    pca9685_init_desc(&pca9685_dev, CONFIG_PCA9685_I2C_ADDR, i2c_port_t::I2C_NUM_0,
+      static_cast<gpio_num_t> (CONFIG_PCA9685_I2C_MASTER_SDA),
+      static_cast<gpio_num_t> (CONFIG_PCA9685_I2C_MASTER_SCL)));
+  ESP_ERROR_CHECK(pca9685_init(&pca9685_dev));
 
-  /* Register i2c device*/
-  pca9685_i2c_register(&pca9685_1,
-                       I2C_ADDRESS_PCA9685,
-                       I2C_ALL_CALL_ADDRESS_PCA9685,
-                       I2C_SUB_ADDRESS_1_PCA9685,
-                       I2C_SUB_ADDRESS_2_PCA9685,
-                       I2C_SUB_ADDRESS_3_PCA9685); /* Use default values */
+  ESP_ERROR_CHECK(pca9685_restart(&pca9685_dev));
 
-#if USE_I2C_ADDRESS == I2C_DEFAULT_ADDRESS
+  pca9685servo_init(&pca9685_dev);
 
-  //Already in default I2C address
+  for (int idx = 0; idx < 16; idx++) {
+    const auto sg90 = new PCA9685Servo(std::format("Pin{}", idx));
+    sg90->target(500);
+    sg90->step((esp_random() % 5) + 1);
+    sg90->onReached([](PCA9685Servo *pca9685_servo, const int16_t step) {
+      const auto abs_step = (esp_random() % 5) + 1;
+      if (step > 0) {
+        pca9685_servo->target(100);
+        pca9685_servo->step(abs_step * -1);
+      } else {
+        pca9685_servo->target(500);
+        pca9685_servo->step(abs_step);
+      }
+    });
 
-#elif USE_I2C_ADDRESS == I2C_SUB_ADDRESS_1
-
-    err += pca9685_i2c_sub_addr_resp(pca9685_1, PCA9685_SUB_ADDR_1, PCA9685_ADDR_RESPOND); /* Enable subaddres 1 response*/
-    ESP_LOGI(TAG, "Enable subaddress 1: %s", err == PCA9685_OK ? "Successful" : "Failed");
-    pca9685_1.i2c_addr =  pca9685_1.sub_addr_1; /* Assign i2c_addr to subaddress 1 */
-
-#elif USE_I2C_ADDRESS == I2C_SUB_ADDRESS_2
-
-    err += pca9685_i2c_sub_addr_resp(pca9685_1, PCA9685_SUB_ADDR_2, PCA9685_ADDR_RESPOND); /* Enable subaddres 2 response*/
-    ESP_LOGI(TAG, "Enable subaddress 2: %s", err == PCA9685_OK ? "Successful" : "Failed");
-    pca9685_1.i2c_addr =  pca9685_1.sub_addr_2; /* Assign i2c_addr to subaddress 2 */
-
-#elif USE_I2C_ADDRESS == I2C_SUB_ADDRESS_3
-
-    err += pca9685_i2c_sub_addr_resp(pca9685_1, PCA9685_SUB_ADDR_3, PCA9685_ADDR_RESPOND); /* Enable subaddres 3 response*/
-    ESP_LOGI(TAG, "Enable subaddress 3: %s", err == PCA9685_OK ? "Successful" : "Failed");
-    pca9685_1.i2c_addr =  pca9685_1.sub_addr_3; /* Assign i2c_addr to subaddress 3 */
-
-#elif USE_I2C_ADDRESS == I2C_ALLCALL_ADDRESS
-
-    /* All call address response is already enabled by default */
-    pca9685_1.i2c_addr =  pca9685_1.allcall_addr;
-
-#endif
-
-  ESP_LOGI(TAG, "i2c_addr: 0x%02x", pca9685_1.i2c_addr);
-
-  err += pca9685_i2c_write_pre_scale(pca9685_1, SERVO_PWM_FREQ, PCA9685_OSC_CLK);
-  /* Setting frequency to 50 Hz (200ms) */
-  ESP_LOGI(TAG, "Frequency Setting: %s", err == PCA9685_OK ? "Successful" : "Failed");
-
-  pca9685_i2c_sleep_mode(pca9685_1, PCA9685_MODE_NORMAL);
-  pca9685_i2c_autoincrement(pca9685_1, PCA9685_AUTOINCR_ON); /* Register increment every read/write */
-
-  if (err == ESP_OK) {
-    ESP_LOGI(TAG, "PCA9685 initialization successful");
-
-    pca9685servo_init(&pca9685_1);
-
-    for (int idx = 0; idx < 16; idx++) {
-      const auto sg90 = new PCA9685Servo(std::format("Pin{}", idx));
-      sg90->target(500);
-      sg90->step((esp_random() % 5) + 1);
-      sg90->onReached([](PCA9685Servo *pca9685_servo, const int16_t step) {
-        const auto abs_step = (esp_random() % 5) + 1;
-        if (step > 0) {
-          pca9685_servo->target(100);
-          pca9685_servo->step(abs_step * -1);
-        } else {
-          pca9685_servo->target(500);
-          pca9685_servo->step(abs_step);
-        }
-      });
-
-      pca9685servo_set_servo(idx, sg90);
-    }
-
-    while (1) {
-      vTaskDelay(pdMS_TO_TICKS(1000));
-    }
-
-    pca9685servo_close();
-  } else {
-    ESP_LOGE(TAG, "PCA9685 initialization failed!");
+    pca9685servo_set_servo(idx, sg90);
   }
+
+  while (true) {
+    vTaskDelay(pdMS_TO_TICKS(1000));
+  }
+
+  pca9685servo_close();
 }

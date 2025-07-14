@@ -13,11 +13,11 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 
-#include "pca9685_i2c.h"
+#include "pca9685.h"
 
 #include "pca9685_servo.h"
 
-void pca9685servo_init(const pca9685_dev_t *pca9685);
+void pca9685servo_init(i2c_dev_t *pca9685);
 
 void pca9685servo_close();
 

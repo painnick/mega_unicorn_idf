@@ -9,7 +9,7 @@
 #include <string>
 #include "esp_log.h"
 
-#include "pca9685_i2c.h"
+#include "pca9685.h"
 
 class PCA9685Servo;
 typedef std::function<void(PCA9685Servo *servo, int16_t step)> OnReached;
@@ -49,7 +49,7 @@ class PCA9685Servo {
 
     [[nodiscard]] int16_t step() const { return _step; }
 
-    void update(const pca9685_dev_t *pca9685_for_servo, uint8_t idx);
+    void update(i2c_dev_t *dev, uint8_t idx);
 
     void onReached(const OnReached &onReached_) { _onReached = onReached_; };
 };

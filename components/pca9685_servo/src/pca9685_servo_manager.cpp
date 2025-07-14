@@ -8,15 +8,15 @@ static auto TAG = "PCA9685SRVMNG";
 
 #define TIMER_PERIOD_NS (20 * 1000) // 20ms
 
-const pca9685_dev_t *pca9685_for_servo;
+i2c_dev_t *dev;
 esp_timer_handle_t pca9685servo_periodic_timer;
 
 PCA9685Servo *servos[16] = {nullptr};
 
 static void pca9685servo_periodic_timer_callback(void *arg);
 
-void pca9685servo_init(const pca9685_dev_t *pca9685) {
-  pca9685_for_servo = pca9685;
+void pca9685servo_init(i2c_dev_t *pca9685) {
+  dev = pca9685;
 
   ESP_LOGI(TAG, "Initializing hardware timer...");
   constexpr esp_timer_create_args_t periodic_timer_args = {
@@ -49,7 +49,7 @@ static void pca9685servo_periodic_timer_callback(void *arg) {
     if (servos[i] == nullptr) {
       ESP_LOGV(TAG, "Servo[%d] Isn't set.", i);
     } else {
-      servos[i]->update(pca9685_for_servo, i);
+      servos[i]->update(dev, i);
     }
   }
 }
